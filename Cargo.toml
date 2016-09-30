@@ -1,0 +1,8 @@
+[package]
+name = "comment-server"
+version = "0.1.0"
+authors = ["Jonathan Fok kan <jfokkan@gmail.com>"]
+
+[dependencies]
+ws = "0.5.3"
+env_logger = "0.3.5"
