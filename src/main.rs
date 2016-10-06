@@ -1,22 +1,34 @@
-extern crate ws;
-extern crate env_logger;
+#[macro_use(o, slog_info, slog_crit, slog_debug, slog_error, slog_log, slog_trace, slog_warn)]
+extern crate slog;
+extern crate slog_term;
+#[macro_use]
+extern crate slog_scope;
 
-use ws::{listen, Sender, Factory, Handler};
+extern crate ws;
+
+use ws::{Sender, Factory, Handler};
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 use std::rc::Rc;
-use std::cell::{RefCell, Ref};
+use std::cell::RefCell;
+
+use slog::DrainExt;
 
 fn main() {
+    // Setup logging for terminal
+    let root_log = slog::Logger::root(slog_term::streamer().full().build().fuse(),
+                                      o!("version" => env!("CARGO_PKG_VERSION")));
+    slog_scope::set_global_logger(root_log);
 
-    let mut senders_by_thread = HashMap::<usize, Rc<RefCell<Vec<ws::Sender>>>>::new();
-    // Setup logging
-    env_logger::init().unwrap();
+    let addr = "127.0.0.1:3012";
+    info!("starting up server"; "addr" => addr);
+
+    let senders_by_thread = HashMap::<usize, Rc<RefCell<Vec<ws::Sender>>>>::new();
 
     let factory = MyFactory { senders_by_thread: senders_by_thread };
     match ws::WebSocket::new(factory) {
         Ok(ws) => {
-            if let Err(error) = ws.listen("127.0.0.1:3012") {
+            if let Err(error) = ws.listen(addr) {
                 // Inform the user of failure
                 println!("Failed to create WebSocket due to {:?}", error);
             }
@@ -37,7 +49,9 @@ impl Handler for MyHandler {
     fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
         println!("Server got message '{}'. ", msg);
         for sender in self.senders.borrow().iter() {
-            sender.send(msg.clone());
+            if let Err(err) = sender.send(msg.clone()) {
+                // error!("this is printed by default");
+            }
         }
         self.ws.send(msg)
     }
@@ -78,7 +92,8 @@ impl Factory for MyFactory {
         MyHandler {
             ws: ws,
             is_server: true,
-            senders: self.senders_by_thread.get(&0).unwrap().clone(), // should always have senders since if it doesn't exists it will be added
+            // should always have senders since if it doesn't exists it will be added
+            senders: self.senders_by_thread.get(&0).unwrap().clone(),
         }
     }
 }
