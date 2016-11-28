@@ -23,6 +23,7 @@ type CommentThread struct {
 	CreatedOn       time.Time `db:"created_on"`
 	PageUrl         string    `db:"page_url"`
 	Title           string    `db:"title"`
+	Website         string    `db:"website"`
 }
 
 func (a CommentThread) Equal(b CommentThread) bool {

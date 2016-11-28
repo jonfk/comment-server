@@ -84,6 +84,10 @@ func TestCommentThreads(t *testing.T) {
 }
 
 func TestCreateNewComment(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode.")
+	}
+
 	db, err := sqlx.Connect("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=disable", DBUser, DBName, DBPassword))
 	if err != nil {
 		t.Fatalf("sqlx.Connect failed : %v\n", err)
