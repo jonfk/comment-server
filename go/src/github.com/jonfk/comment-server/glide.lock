@@ -1,5 +1,5 @@
-hash: 1d5613e46aa19093206803237afa09e1b7ab351f19390f79263a804e6c748afc
-updated: 2016-11-26T21:42:29.137788284-05:00
+hash: b104a8f37012213198d49bbe5ed38746a7c933d5837ea0ef034769d2963b161d
+updated: 2016-11-27T23:56:09.082715146-05:00
 imports:
 - name: github.com/gorilla/websocket
   version: 1f512fc3f05332ba7117626cdfb4e07474e58e60
@@ -9,12 +9,20 @@ imports:
   - reflectx
 - name: github.com/joho/godotenv
   version: a01a834e1654b4c9ca5b3ad05159445cc9c7ad08
+- name: github.com/jonfk/comment-server
+  version: ecaf4f28aa0a59c9aa6f0bc49bc7d97922246468
+  subpackages:
+  - commands
+  - events
+  - accounts
 - name: github.com/lib/pq
   version: d8eeeb8bae8896dd8e1b7e514ab0d396c4f12a1b
   subpackages:
   - oid
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
+- name: github.com/Sirupsen/logrus
+  version: d26492970760ca5d33129d2d799e34be5c4782eb
 - name: golang.org/x/crypto
   version: ede567c8e044a5913dad1d1af3696d9da953104c
   subpackages:
