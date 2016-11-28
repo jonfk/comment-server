@@ -21,9 +21,10 @@ type EventPayload interface {
 }
 
 type AccountCreated struct {
-	AccountId uuid.UUID `json:"accountId"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
+	AccountId      uuid.UUID `json:"accountId"`
+	Username       string    `json:"username"`
+	Email          string    `json:"email"`
+	HashedPassword string    `json:"hashedPassword"`
 }
 
 type AccountDeleted struct {

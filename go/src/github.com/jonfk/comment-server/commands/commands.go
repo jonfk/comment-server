@@ -21,9 +21,9 @@ type CommandPayload interface {
 }
 
 type CreateAccount struct {
-	Username string `json:"username,omitempty"`
-	Email    string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
+	Username         string `json:"username,omitempty"`
+	Email            string `json:"email,omitempty"`
+	UnhashedPassword string `json:"unhashedPassword,omitempty"`
 }
 
 type DeleteAccount struct {

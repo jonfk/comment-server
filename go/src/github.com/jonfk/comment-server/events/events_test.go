@@ -12,8 +12,9 @@ func TestMarshalJSON(t *testing.T) {
 	parentId := uuid.NewV4()
 	eventPayloads := []EventPayload{
 		AccountCreated{AccountId: uuid.NewV4(),
-			Username: "username",
-			Email:    "email@example.com"},
+			Username:       "username",
+			Email:          "email@example.com",
+			HashedPassword: "hashed_password"},
 		AccountDeleted{AccountId: uuid.NewV4()},
 		CommentThreadCreated{CommentThreadId: uuid.NewV4(),
 			PageUrl: "pageurl.com",
