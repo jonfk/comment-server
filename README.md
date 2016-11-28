@@ -1,14 +1,10 @@
 # comment-server
 
-## external dependencies
-These are the dependencies managed manually outside of the build system
-```
-# on osx
-brew install openssl
-```
+comment-server is a standalone comment server that should serve comments to clients embedded in a website.
+This can be especially useful for static websites which can get working comments without hosting a backend 
+for the website. 
 
-Following the discussion here: https://github.com/sfackler/rust-openssl/issues/255. Openssl needs the following
-environment variables exported:
-```bash
-export C_INCLUDE_PATH=/usr/local/opt/openssl/include
-```
+## Goals
+* comment-server aims to serve comments to multiple websites from the same instance.
+* real time comments
+* admin tools
