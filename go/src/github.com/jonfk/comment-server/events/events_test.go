@@ -1,6 +1,7 @@
 package events
 
 import (
+	//"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -14,7 +15,8 @@ func TestMarshalJSON(t *testing.T) {
 		AccountCreated{AccountId: uuid.NewV4(),
 			Username:       "username",
 			Email:          "email@example.com",
-			HashedPassword: "hashed_password"},
+			HashedPassword: []byte("hashed_password"),
+			HashSalt:       []byte("scrypt salt")},
 		AccountDeleted{AccountId: uuid.NewV4()},
 		CommentThreadCreated{CommentThreadId: uuid.NewV4(),
 			PageUrl: "pageurl.com",
@@ -42,6 +44,7 @@ func TestMarshalJSON(t *testing.T) {
 		if err != nil {
 			t.Fatalf("MarshalJSON failed : %v", err)
 		}
+		//fmt.Println(string(encodedEvent))
 		encodedEvents = append(encodedEvents, encodedEvent)
 	}
 
