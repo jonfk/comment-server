@@ -5,7 +5,15 @@ export GOPATH=$(shell pwd)
 
 install:
 	go install github.com/jonfk/comment-server
+	go install github.com/jonfk/comment-server/accounts
+	go install github.com/jonfk/comment-server/comments
+	go install github.com/jonfk/comment-server/commands
+	go install github.com/jonfk/comment-server/events
 	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server
+	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/accounts
+	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/comments
+	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/commands
+	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/events
 
 clean:
 	rm -rf ./bin/
