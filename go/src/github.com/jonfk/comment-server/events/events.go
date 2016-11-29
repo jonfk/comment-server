@@ -66,6 +66,7 @@ func (e CommentDeleted) EventType() string       { return CommentDeletedTypeName
 type EventJSON struct {
 	EventType string          `json:"eventType"`
 	Timestamp time.Time       `json:"timestamp"`
+	EventId   uuid.UUID       `json:"eventId"`
 	Payload   json.RawMessage `json:"payload"`
 }
 
@@ -103,6 +104,7 @@ func UnmarshalJSON(input []byte) (Event, error) {
 		}
 		return Event{EventType: eventPayload.EventType(),
 			Timestamp: rawEvent.Timestamp,
+			EventId:   rawEvent.EventId,
 			Payload:   eventPayload}, nil
 	case AccountDeletedTypeName:
 		eventPayload := AccountDeleted{}
@@ -112,6 +114,7 @@ func UnmarshalJSON(input []byte) (Event, error) {
 		}
 		return Event{EventType: eventPayload.EventType(),
 			Timestamp: rawEvent.Timestamp,
+			EventId:   rawEvent.EventId,
 			Payload:   eventPayload}, nil
 	case CommentThreadCreatedTypeName:
 		eventPayload := CommentThreadCreated{}
@@ -121,6 +124,7 @@ func UnmarshalJSON(input []byte) (Event, error) {
 		}
 		return Event{EventType: eventPayload.EventType(),
 			Timestamp: rawEvent.Timestamp,
+			EventId:   rawEvent.EventId,
 			Payload:   eventPayload}, nil
 	case CommentCreatedTypeName:
 		eventPayload := CommentCreated{}
@@ -130,6 +134,7 @@ func UnmarshalJSON(input []byte) (Event, error) {
 		}
 		return Event{EventType: eventPayload.EventType(),
 			Timestamp: rawEvent.Timestamp,
+			EventId:   rawEvent.EventId,
 			Payload:   eventPayload}, nil
 	case CommentDeletedTypeName:
 		eventPayload := CommentDeleted{}
@@ -139,6 +144,7 @@ func UnmarshalJSON(input []byte) (Event, error) {
 		}
 		return Event{EventType: eventPayload.EventType(),
 			Timestamp: rawEvent.Timestamp,
+			EventId:   rawEvent.EventId,
 			Payload:   eventPayload}, nil
 	default:
 		return Event{}, fmt.Errorf("unknown event type %s", rawEvent.EventType)

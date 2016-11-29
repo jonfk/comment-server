@@ -32,7 +32,7 @@ func TestMarshalJSON(t *testing.T) {
 	expectedEvents := []Event{}
 
 	for i, payload := range eventPayloads {
-		event := NewEvent(time.Now().Add(time.Duration(i)*time.Minute), payload)
+		event := NewEvent(time.Now().Add(time.Duration(i)*time.Minute).Round(time.Second), payload)
 		expectedEvents = append(expectedEvents, event)
 	}
 
