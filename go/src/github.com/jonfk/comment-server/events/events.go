@@ -16,6 +16,13 @@ const (
 	CommentDeletedTypeName       = "CommentDeleted"
 )
 
+type Event struct {
+	EventType string       `json:"eventType"`
+	Timestamp time.Time    `json:"timestamp"`
+	EventId   uuid.UUID    `json:"eventId"`
+	Payload   EventPayload `json:"payload"`
+}
+
 type EventPayload interface {
 	EventType() string
 }
@@ -56,12 +63,6 @@ func (e CommentThreadCreated) EventType() string { return CommentThreadCreatedTy
 func (e CommentCreated) EventType() string       { return CommentCreatedTypeName }
 func (e CommentDeleted) EventType() string       { return CommentDeletedTypeName }
 
-type Event struct {
-	EventType string       `json:"eventType"`
-	Timestamp time.Time    `json:"timestamp"`
-	Payload   EventPayload `json:"payload"`
-}
-
 type EventJSON struct {
 	EventType string          `json:"eventType"`
 	Timestamp time.Time       `json:"timestamp"`
@@ -71,6 +72,14 @@ type EventJSON struct {
 func NewEvent(timestamp time.Time, payload EventPayload) Event {
 	return Event{EventType: payload.EventType(),
 		Timestamp: timestamp,
+		EventId:   uuid.NewV4(),
+		Payload:   payload}
+}
+
+func NewEventWithId(timestamp time.Time, payload EventPayload, eventId uuid.UUID) Event {
+	return Event{EventType: payload.EventType(),
+		Timestamp: timestamp,
+		EventId:   eventId,
 		Payload:   payload}
 }
 

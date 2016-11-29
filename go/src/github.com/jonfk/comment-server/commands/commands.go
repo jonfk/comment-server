@@ -16,6 +16,11 @@ const (
 	DeleteCommentTypeName       = "DeleteComment"
 )
 
+type Command struct {
+	CommandType string         `json:"commandType"`
+	Payload     CommandPayload `json:"payload"`
+}
+
 type CommandPayload interface {
 	CommandType() string
 }
@@ -107,11 +112,6 @@ func UnmarshalJSON(input []byte) (CommandPayload, error) {
 	default:
 		return CreateAccount{}, fmt.Errorf("unknown command type %s", commandRaw.CommandType)
 	}
-}
-
-type Command struct {
-	CommandType string         `json:"commandType"`
-	Payload     CommandPayload `json:"payload"`
 }
 
 func MarshalJSON(command Command) ([]byte, error) {
