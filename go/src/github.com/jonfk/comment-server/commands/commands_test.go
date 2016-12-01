@@ -17,8 +17,7 @@ func TestJsonMarshalCommands(t *testing.T) {
 			UnhashedPassword: "unhashed_password",
 		},
 		DeleteAccount{
-			Username: "username",
-			Email:    "email",
+			AccountId: uuid.NewV4(),
 		},
 		CreateCommentThread{
 			PageUrl: "pageUrl",
