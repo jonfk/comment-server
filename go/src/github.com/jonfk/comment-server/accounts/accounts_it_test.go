@@ -128,3 +128,28 @@ func testVerify(t *testing.T, accountId uuid.UUID, expectedUnhashedPassword stri
 		t.Fatal("accounts.Verify failed to verify the correct password")
 	}
 }
+
+func TestGetAccountDoesNotExist(t *testing.T) {
+
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode.")
+	}
+
+	db, err := sqlx.Connect("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=disable", DBUser, DBName, DBPassword))
+	if err != nil {
+		t.Fatalf("sqlx.Connect failed : %v\n", err)
+	}
+
+	accounts := &Accounts{DB: db}
+
+	account, err := accounts.GetAccountByAccountId(uuid.NewV4())
+	if err == nil {
+		t.Fatal("Error should not be nil because account should not exist")
+	}
+
+	if err != AccountNotFoundErr {
+		t.Fatalf("Wrong nil error returned %v", err)
+	}
+
+	fmt.Printf("account: %v, err: %v\n", account, err)
+}

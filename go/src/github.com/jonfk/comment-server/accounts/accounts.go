@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"time"
 
 	"github.com/satori/go.uuid"
@@ -100,7 +101,15 @@ func (a *Accounts) GetAccountByAccountId(accountId uuid.UUID) (Account, error) {
 	var account Account
 	err := a.DB.Get(&account, "SELECT account_id,username,email,hashed_password,hash_salt,created_on FROM accounts where account_id = $1",
 		accountId)
-	return account, err
+	if err != nil {
+		switch {
+		case err == sql.ErrNoRows:
+			return account, AccountNotFoundErr
+		default:
+			return account, err
+		}
+	}
+	return account, nil
 }
 
 func (a *Accounts) GetAccountByEmail(email string) (Account, error) {
