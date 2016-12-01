@@ -4,11 +4,14 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 )
 
-var addr = flag.String("addr", ":8080", "http service address")
-var homeTemplate = template.Must(template.ParseFiles("home.html"))
+var (
+	addr         = flag.String("addr", ":8080", "http service address")
+	homeTemplate = template.Must(template.ParseFiles(os.Getenv("PATH_DEBUG_PATH")))
+)
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL)
@@ -24,8 +27,11 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 	homeTemplate.Execute(w, r.Host)
 }
 
-func main() {
+func init() {
 	flag.Parse()
+}
+
+func main() {
 	hub := newHub()
 	go hub.run()
 	http.HandleFunc("/", serveHome)
