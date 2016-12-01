@@ -17,4 +17,5 @@ func (handler LogEventHandler) HandleEvent(event Event) error {
 		"context": "LogEventHandler",
 		"event":   event,
 	}).Info("Event Handled")
+	return nil
 }
