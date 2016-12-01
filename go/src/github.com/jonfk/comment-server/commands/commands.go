@@ -32,7 +32,7 @@ type CreateAccount struct {
 }
 
 type DeleteAccount struct {
-	AccountId uuid.UUID `json:"accountId,omitempty`
+	AccountId uuid.UUID `json:"accountId"`
 }
 
 type CreateCommentThread struct {
