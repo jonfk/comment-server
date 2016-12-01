@@ -130,7 +130,6 @@ func testVerify(t *testing.T, accountId uuid.UUID, expectedUnhashedPassword stri
 }
 
 func TestGetAccountDoesNotExist(t *testing.T) {
-
 	if testing.Short() {
 		t.Skip("skipping integration test in short mode.")
 	}
