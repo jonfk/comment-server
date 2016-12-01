@@ -1,15 +1,17 @@
 
 export GOPATH=$(shell pwd)
 
-.PHONY: install clean get-deps test unit-test run
+.PHONY: install compile clean get-deps test unit-test run
 
 install:
 	go install github.com/jonfk/comment-server/bin/comment-server-debug
+	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/bin/comment-server-debug
+
+compile:
 	go install github.com/jonfk/comment-server/accounts
 	go install github.com/jonfk/comment-server/comments
 	go install github.com/jonfk/comment-server/commands
 	go install github.com/jonfk/comment-server/events
-	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/bin/comment-server-debug
 	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/accounts
 	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/comments
 	GOOS=linux GOARCH=amd64 go install github.com/jonfk/comment-server/commands
@@ -36,3 +38,6 @@ unit-test:
 
 run:
 	# commands to run during development
+
+run-debug: install
+	source src/github.com/jonfk/comment-server/.env && ./bin/comment-server-debug
