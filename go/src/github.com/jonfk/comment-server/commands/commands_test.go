@@ -12,12 +12,16 @@ func TestJsonMarshalCommands(t *testing.T) {
 	parentId := uuid.NewV4()
 	commandPayloads := []CommandPayload{
 		CreateAccount{
-			Username:         "username",
-			Email:            "email",
-			UnhashedPassword: "unhashed_password",
+			Username: "username",
+			Email:    "email",
+			Password: "unhashed_password",
 		},
 		DeleteAccount{
 			AccountId: uuid.NewV4(),
+		},
+		LoginAccount{
+			EmailOrUsername: "email_or_username",
+			Password:        "password",
 		},
 		CreateCommentThread{
 			PageUrl: "pageUrl",

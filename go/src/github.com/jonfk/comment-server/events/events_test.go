@@ -18,6 +18,7 @@ func TestMarshalJSON(t *testing.T) {
 			HashedPassword: []byte("hashed_password"),
 			HashSalt:       []byte("scrypt salt")},
 		AccountDeleted{AccountId: uuid.NewV4()},
+		AccountLoggedIn{AccountId: uuid.NewV4(), JWT: "invalid_token"},
 		CommentThreadCreated{CommentThreadId: uuid.NewV4(),
 			PageUrl: "pageurl.com",
 			Title:   "title"},

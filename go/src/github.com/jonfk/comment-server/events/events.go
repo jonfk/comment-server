@@ -11,6 +11,7 @@ import (
 const (
 	AccountCreatedTypeName       = "AccountCreatedEvent"
 	AccountDeletedTypeName       = "AccountDeleted"
+	AccountLoggedInTypeName      = "AccountLoggedIn"
 	CommentThreadCreatedTypeName = "CommentThreadCreated"
 	CommentCreatedTypeName       = "CommentCreated"
 	CommentDeletedTypeName       = "CommentDeleted"
@@ -39,6 +40,11 @@ type AccountDeleted struct {
 	AccountId uuid.UUID `json:"accountId"`
 }
 
+type AccountLoggedIn struct {
+	AccountId uuid.UUID `json:"accountId"`
+	JWT       string    `json:"jwt"`
+}
+
 type CommentThreadCreated struct {
 	CommentThreadId uuid.UUID `json:"commentThreadId"`
 	PageUrl         string    `json:"pageUrl"`
@@ -59,6 +65,7 @@ type CommentDeleted struct {
 
 func (e AccountCreated) EventType() string       { return AccountCreatedTypeName }
 func (e AccountDeleted) EventType() string       { return AccountDeletedTypeName }
+func (e AccountLoggedIn) EventType() string      { return AccountLoggedInTypeName }
 func (e CommentThreadCreated) EventType() string { return CommentThreadCreatedTypeName }
 func (e CommentCreated) EventType() string       { return CommentCreatedTypeName }
 func (e CommentDeleted) EventType() string       { return CommentDeletedTypeName }
@@ -108,6 +115,16 @@ func UnmarshalJSON(input []byte) (Event, error) {
 			Payload:   eventPayload}, nil
 	case AccountDeletedTypeName:
 		eventPayload := AccountDeleted{}
+		err = json.Unmarshal(rawEvent.Payload, &eventPayload)
+		if err != nil {
+			return Event{}, err
+		}
+		return Event{EventType: eventPayload.EventType(),
+			Timestamp: rawEvent.Timestamp,
+			EventId:   rawEvent.EventId,
+			Payload:   eventPayload}, nil
+	case AccountLoggedInTypeName:
+		eventPayload := AccountLoggedIn{}
 		err = json.Unmarshal(rawEvent.Payload, &eventPayload)
 		if err != nil {
 			return Event{}, err

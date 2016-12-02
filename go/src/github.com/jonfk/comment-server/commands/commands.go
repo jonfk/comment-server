@@ -11,6 +11,7 @@ import (
 const (
 	CreateAccountTypeName       = "CreateAccount"
 	DeleteAccountTypeName       = "DeleteAccount"
+	LoginAccountTypeName        = "LoginAccount"
 	CreateCommentThreadTypeName = "CreateCommentThread"
 	CreateCommentTypeName       = "CreateComment"
 	DeleteCommentTypeName       = "DeleteComment"
@@ -26,13 +27,18 @@ type CommandPayload interface {
 }
 
 type CreateAccount struct {
-	Username         string `json:"username,omitempty"`
-	Email            string `json:"email,omitempty"`
-	UnhashedPassword string `json:"unhashedPassword,omitempty"`
+	Username string `json:"username,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type DeleteAccount struct {
 	AccountId uuid.UUID `json:"accountId"`
+}
+
+type LoginAccount struct {
+	EmailOrUsername string `json:"emailOrUsername"`
+	Password        string `json:"password"`
 }
 
 type CreateCommentThread struct {
@@ -54,6 +60,7 @@ type DeleteComment struct {
 
 func (c CreateAccount) CommandType() string       { return CreateAccountTypeName }
 func (c DeleteAccount) CommandType() string       { return DeleteAccountTypeName }
+func (c LoginAccount) CommandType() string        { return LoginAccountTypeName }
 func (c CreateCommentThread) CommandType() string { return CreateCommentThreadTypeName }
 func (c CreateComment) CommandType() string       { return CreateCommentTypeName }
 func (c DeleteComment) CommandType() string       { return DeleteCommentTypeName }
@@ -82,6 +89,13 @@ func UnmarshalJSON(input []byte) (CommandPayload, error) {
 		return commandPayload, nil
 	case DeleteAccountTypeName:
 		commandPayload := DeleteAccount{}
+		err = json.Unmarshal(commandRaw.Payload, &commandPayload)
+		if err != nil {
+			return commandPayload, err
+		}
+		return commandPayload, nil
+	case LoginAccountTypeName:
+		commandPayload := LoginAccount{}
 		err = json.Unmarshal(commandRaw.Payload, &commandPayload)
 		if err != nil {
 			return commandPayload, err
