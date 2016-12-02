@@ -1,6 +1,8 @@
-hash: b104a8f37012213198d49bbe5ed38746a7c933d5837ea0ef034769d2963b161d
-updated: 2016-11-27T23:56:09.082715146-05:00
+hash: a863d80c5b6a7c474f023df7e60384a61f83222b1eeb4e7c4dd2ea3f21e788bf
+updated: 2016-12-01T19:15:42.413715693-05:00
 imports:
+- name: github.com/dgrijalva/jwt-go
+  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/gorilla/websocket
   version: 1f512fc3f05332ba7117626cdfb4e07474e58e60
 - name: github.com/jmoiron/sqlx
@@ -24,8 +26,12 @@ imports:
 - name: github.com/Sirupsen/logrus
   version: d26492970760ca5d33129d2d799e34be5c4782eb
 - name: golang.org/x/crypto
-  version: ede567c8e044a5913dad1d1af3696d9da953104c
+  version: 7efbae5d109cb7a2dbc362886213f73c4c55dede
   subpackages:
   - scrypt
   - pbkdf2
+- name: golang.org/x/sys
+  version: d5645953809d8b4752afb2c3224b1f1ad73dfa70
+  subpackages:
+  - unix
 testImports: []
