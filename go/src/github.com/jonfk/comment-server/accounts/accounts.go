@@ -3,8 +3,10 @@ package accounts
 import (
 	"crypto/rand"
 	"database/sql"
+	"fmt"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/scrypt"
 
@@ -13,7 +15,10 @@ import (
 )
 
 type Accounts struct {
-	DB *sqlx.DB
+	DB                   *sqlx.DB
+	SessionLengthInHours int
+	// From http://security.stackexchange.com/questions/95972/what-are-requirements-for-hmac-secret-key
+	HMACSecretKey []byte // Should be a 512 bits random key
 }
 
 type Account struct {
@@ -74,27 +79,40 @@ func (a *Accounts) DeleteById(accountId uuid.UUID) (string, error) {
 	return deletedAccountId, err
 }
 
-func (a *Accounts) Verify(accountId uuid.UUID, unhashedPassword string) (bool, error) {
+func (a *Accounts) Verify(accountId uuid.UUID, unhashedPassword string) error {
 	account, err := a.GetAccountByAccountId(accountId)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	hashedPassword, err := HashPassword(unhashedPassword, account.HashSalt)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if len(hashedPassword) != len(account.HashedPassword) {
-		return false, nil
+		return fmt.Errorf("length of password does not match")
 	}
 
 	for i, x := range hashedPassword {
 		if x != account.HashedPassword[i] {
-			return false, nil
+			return fmt.Errorf("password does not match")
 		}
 	}
-	return true, nil
+	return nil
+}
+
+func (a *Accounts) VerifyAndGenerateJWT(accountId uuid.UUID, unhashedPassword string) (string, error) {
+	if err := a.Verify(accountId, unhashedPassword); err != nil {
+		return "", err
+	}
+	now := time.Now().UTC().Round(time.Second).Add(-1 * time.Second)
+
+	return generateJWT(a.HMACSecretKey, accountId, now, now.Add(time.Duration(a.SessionLengthInHours)*time.Hour))
+}
+
+func (a *Accounts) ValidateJWT(token string) (uuid.UUID, error) {
+	return validateJWT(a.HMACSecretKey, token)
 }
 
 func (a *Accounts) GetAccountByAccountId(accountId uuid.UUID) (Account, error) {
@@ -116,6 +134,14 @@ func (a *Accounts) GetAccountByEmail(email string) (Account, error) {
 	var account Account
 	err := a.DB.Get(&account, "SELECT account_id,username,email,hashed_password,hash_salt,created_on FROM accounts where email = $1",
 		email)
+	if err != nil {
+		switch {
+		case err == sql.ErrNoRows:
+			return account, AccountNotFoundErr
+		default:
+			return account, err
+		}
+	}
 	return account, err
 }
 
@@ -123,6 +149,14 @@ func (a *Accounts) GetAccountByUsername(username string) (Account, error) {
 	var account Account
 	err := a.DB.Get(&account, "SELECT account_id,username,email,hashed_password,hash_salt,created_on FROM accounts where username = $1",
 		username)
+	if err != nil {
+		switch {
+		case err == sql.ErrNoRows:
+			return account, AccountNotFoundErr
+		default:
+			return account, err
+		}
+	}
 	return account, err
 }
 
@@ -140,4 +174,44 @@ func GenerateSalt() ([]byte, error) {
 		return salt, err
 	}
 	return salt, nil
+}
+
+func generateJWT(hmacSecretKey []byte, accountId uuid.UUID, issuedAt, expiresAt time.Time) (string, error) {
+	// Create a new token object, specifying signing method and the claims
+	// you would like it to contain.
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"aid": accountId.String(),
+		"iat": issuedAt.Unix(),
+		"exp": expiresAt.Unix(),
+	})
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString(hmacSecretKey)
+	return tokenString, err
+}
+
+func validateJWT(hmacSecretKey []byte, tokenString string) (uuid.UUID, error) {
+	// Parse takes the token string and a function for looking up the key. The latter is especially
+	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
+	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
+	// to the callback, providing flexibility.
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return hmacSecretKey, nil
+	})
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if accountId, ok := claims["aid"].(string); ok {
+			return uuid.FromString(accountId)
+		} else {
+			return uuid.Nil, fmt.Errorf("validateJWT: cannot cast aid claim to string")
+		}
+	} else {
+		return uuid.Nil, fmt.Errorf("validateJWT: invalid token with claims: %v", claims)
+	}
 }

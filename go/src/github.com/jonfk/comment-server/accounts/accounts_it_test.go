@@ -39,7 +39,10 @@ func TestCreateNewAccount_and_DeleteById(t *testing.T) {
 		t.Fatalf("sqlx.Connect failed : %v\n", err)
 	}
 
-	accounts := &Accounts{DB: db}
+	accounts := &Accounts{DB: db,
+		HMACSecretKey:        []byte("secret_key"),
+		SessionLengthInHours: 256,
+	}
 
 	expectedAccount := Account{
 		Username:  "username",
@@ -119,13 +122,23 @@ func testGetAccountByUsername(t *testing.T, expectedAccount Account, accounts *A
 
 func testVerify(t *testing.T, accountId uuid.UUID, expectedUnhashedPassword string, accounts *Accounts) {
 
-	valid, err := accounts.Verify(accountId, expectedUnhashedPassword)
+	err := accounts.Verify(accountId, expectedUnhashedPassword)
 	if err != nil {
 		t.Fatalf("accounts.Verify failed : %v", err)
 	}
 
-	if !valid {
-		t.Fatal("accounts.Verify failed to verify the correct password")
+	token, err := accounts.VerifyAndGenerateJWT(accountId, expectedUnhashedPassword)
+	if err != nil {
+		t.Fatalf("accounts.VerifyAndGenerateJWT failed : %v", err)
+	}
+
+	validatedAccount, err := accounts.ValidateJWT(token)
+	if err != nil {
+		t.Fatalf("accounts.ValidateJWT failed : %v", err)
+	}
+
+	if !uuid.Equal(accountId, validatedAccount) {
+		t.Fatalf("expectedAccountId != validatedAccountId\n(expectedAccountId) %v != (validatedAccountId) %v", accountId, validatedAccount)
 	}
 }
 
@@ -141,7 +154,7 @@ func TestGetAccountDoesNotExist(t *testing.T) {
 
 	accounts := &Accounts{DB: db}
 
-	account, err := accounts.GetAccountByAccountId(uuid.NewV4())
+	_, err = accounts.GetAccountByAccountId(uuid.NewV4())
 	if err == nil {
 		t.Fatal("Error should not be nil because account should not exist")
 	}
@@ -150,5 +163,22 @@ func TestGetAccountDoesNotExist(t *testing.T) {
 		t.Fatalf("Wrong nil error returned %v", err)
 	}
 
-	fmt.Printf("account: %v, err: %v\n", account, err)
+	_, err = accounts.GetAccountByEmail("dummy@email.com")
+	if err == nil {
+		t.Fatal("Error should not be nil because account should not exist")
+	}
+
+	if err != AccountNotFoundErr {
+		t.Fatalf("Wrong nil error returned %v", err)
+	}
+
+	_, err = accounts.GetAccountByUsername("dummy_username")
+	if err == nil {
+		t.Fatal("Error should not be nil because account should not exist")
+	}
+
+	if err != AccountNotFoundErr {
+		t.Fatalf("Wrong nil error returned %v", err)
+	}
+
 }
