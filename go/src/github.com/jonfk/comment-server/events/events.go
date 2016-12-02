@@ -77,9 +77,9 @@ type EventJSON struct {
 	Payload   json.RawMessage `json:"payload"`
 }
 
-func NewEvent(timestamp time.Time, payload EventPayload) Event {
+func NewEventNow(payload EventPayload) Event {
 	return Event{EventType: payload.EventType(),
-		Timestamp: timestamp,
+		Timestamp: time.Now().UTC().Round(time.Second),
 		EventId:   uuid.NewV4(),
 		Payload:   payload}
 }
