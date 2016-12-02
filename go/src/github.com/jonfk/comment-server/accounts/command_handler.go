@@ -2,7 +2,6 @@ package accounts
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/jonfk/comment-server/commands"
 	"github.com/jonfk/comment-server/events"
@@ -24,7 +23,7 @@ func (c *CommandHandler) HandleCommand(command commands.Command) (events.Event, 
 			// Fix error to be friendly
 			return events.Event{}, err
 		}
-		hashedPassword, err := HashPassword(commandPayload.UnhashedPassword, salt)
+		hashedPassword, err := HashPassword(commandPayload.Password, salt)
 		if err != nil {
 			// Fix error to be friendly
 			return events.Event{}, err
@@ -37,7 +36,7 @@ func (c *CommandHandler) HandleCommand(command commands.Command) (events.Event, 
 			HashedPassword: hashedPassword,
 			HashSalt:       salt,
 		}
-		event := events.NewEvent(time.Now().UTC().Round(time.Second), eventPayload)
+		event := events.NewEventNow(eventPayload)
 		c.EventHandler.HandleEvent(event)
 	case commands.DeleteAccount:
 		account, err := c.AccountsService.GetAccountByAccountId(commandPayload.AccountId)
@@ -45,7 +44,24 @@ func (c *CommandHandler) HandleCommand(command commands.Command) (events.Event, 
 			return events.Event{}, err
 		}
 
-		event := events.NewEvent(time.Now().UTC().Round(time.Second), events.AccountDeleted{AccountId: account.AccountId})
+		event := events.NewEventNow(events.AccountDeleted{AccountId: account.AccountId})
+		c.EventHandler.HandleEvent(event)
+	case commands.LoginAccount:
+		account, err := c.AccountsService.GetAccountByEmail(commandPayload.Email)
+		if err != nil {
+			return events.Event{}, err
+		}
+
+		token, err := c.AccountsService.VerifyAndGenerateJWT(account.AccountId, commandPayload.Password)
+		if err != nil {
+			return events.Event{}, err
+		}
+
+		eventPayload := events.AccountLoggedIn{
+			AccountId: account.AccountId,
+			JWT:       token,
+		}
+		event := events.NewEventNow(eventPayload)
 		c.EventHandler.HandleEvent(event)
 	case commands.CreateCommentThread:
 		// Command not handled by Accounts
