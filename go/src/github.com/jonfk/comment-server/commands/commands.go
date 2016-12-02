@@ -37,8 +37,8 @@ type DeleteAccount struct {
 }
 
 type LoginAccount struct {
-	EmailOrUsername string `json:"emailOrUsername"`
-	Password        string `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type CreateCommentThread struct {

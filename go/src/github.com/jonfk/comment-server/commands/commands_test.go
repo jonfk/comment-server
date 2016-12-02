@@ -20,8 +20,8 @@ func TestJsonMarshalCommands(t *testing.T) {
 			AccountId: uuid.NewV4(),
 		},
 		LoginAccount{
-			EmailOrUsername: "email_or_username",
-			Password:        "password",
+			Email:    "email@example.com",
+			Password: "password",
 		},
 		CreateCommentThread{
 			PageUrl: "pageUrl",
