@@ -1,0 +1,8 @@
+digraph statemachine {
+  commentview -> accountview [ label = "click sign in (SWITCH_VIEW to ACCOUNT_VIEW)"]
+  commentview -> commentview [ label = "add comment (ADD_COMMENT)"]
+  commentview -> commentview [ label = "reply comment (REPLY_COMMENT)"]
+  accountview -> accountview [ label = "sign in (SIGN_IN)"]
+  accountview -> accountview [ label = "create account (CREATE_ACCOUNT)"]
+  accountview -> commentview [ label = "SWITCH_VIEW to COMMENT_VIEW"]
+}
