@@ -13,3 +13,20 @@ A comment thread can be uniquely identified by the domain and title of a comment
 There should be 2 clients interfacing with the backend. 
 * An admin view where users can register domains to create comment threads on 
 * A client view that is displayed on web pages displaying comments
+
+3 types of user accounts:
+* fully loggedin user
+    - Can change avatar?
+    - can change username
+    - can delete account
+    - can control comments and delete comments
+* email user
+    - can identify user
+    - gravatar?
+* anonymous user
+
+login methods:
+* email sent
+    - websocket connection to create authentication flow, send email, confirm link, send authentication token
+    - Better? Create token with a revokable claim. Send email, confirm link, revokable claim becomes authenticated claim
+* password authentication
