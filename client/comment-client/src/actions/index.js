@@ -14,12 +14,20 @@ export function switchView(view) {
     return { type: SWITCH_VIEW, view: view };
 }
 
-export function addComment(text) {
-    return { type: ADD_COMMENT, text: text };
+export function addComment(comment) {
+    return { type: ADD_COMMENT, comment: {
+        id: comment.id,
+        text: comment.text,
+        author: comment.author
+    }};
 }
 
-export function replyComment(parentId, text) {
-    return { type: REPLY_COMMENT, parentId: parentId, text: text };
+export function replyComment(parentId, comment) {
+    return { type: REPLY_COMMENT, parentId: parentId, comment: {
+        id: comment.id,
+        text: comment.text,
+        author: comment.author
+    }};
 }
 
 export function signIn(token) {
