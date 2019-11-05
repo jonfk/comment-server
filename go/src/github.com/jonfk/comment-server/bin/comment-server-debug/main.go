@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"net/http"
 	"os"
 	"text/template"
@@ -14,6 +14,11 @@ var (
 )
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
+	log.WithFields(log.Fields{
+		"context": "serveHome",
+		"url":     r.URL,
+		"method":  r.Method,
+	}).Info("Received request")
 	log.Println(r.URL)
 	if r.URL.Path != "/" {
 		http.Error(w, "Not found", 404)
@@ -38,6 +43,11 @@ func main() {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
+
+	log.WithFields(log.Fields{
+		"context": "main",
+		"addr":    *addr,
+	}).Info("http Listening and Serving")
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

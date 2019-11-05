@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS accounts (
 CREATE TABLE IF NOT EXISTS comment_threads (
        comment_thread_id UUID PRIMARY KEY,
        created_on TIMESTAMP WITH TIME ZONE,
+       --website TEXT REFERENCES websites(url) NOT NULL,
        page_url TEXT NOT NULL,
        title TEXT
 );
@@ -30,4 +31,8 @@ CREATE TABLE IF NOT EXISTS comments (
        parent_id UUID REFERENCES comments(comment_id),
        comment_thread_id UUID REFERENCES comment_threads(comment_thread_id),
        account_id UUID REFERENCES accounts(account_id)
+);
+
+CREATE TABLE IF NOT EXISTS websites (
+       url TEXT PRIMARY KEY
 );

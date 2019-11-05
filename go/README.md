@@ -1,5 +1,7 @@
 # comment-server-go
 
+A self hostable comment server. 
+
 ## Design Notes
 The system takes in events and commands. 
 * Events are what happened in the past. 
